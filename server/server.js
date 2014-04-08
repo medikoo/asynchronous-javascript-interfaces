@@ -1,7 +1,7 @@
 'use strict';
 
-var endsWith     = require('es5-ext/string/#/ends-with')
-  , startsWith   = require('es5-ext/string/#/starts-with')
+var endsWith     = require('es5-ext/lib/String/prototype/ends-with')
+  , startsWith   = require('es5-ext/lib/String/prototype/starts-with')
   , promisify    = require('deferred').promisify
   , memoize      = require('memoizee')
   , readFile     = promisify(require('fs').readFile)

@@ -1,0 +1,24 @@
+{
+  "name": "asynchronous-javascript-interfaces",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": {
+    "bespoke": "0.4.x",
+    "bespoke-history": "0.1.x",
+    "bespoke-keys": "0.1.x",
+    "bespoke-notes": "0.1.x",
+    "bespoke-progress": "0.1.x",
+    "bespoke-touch": "0.1.x",
+    "connect": "~2.14",
+    "deferred": "~0.6.8",
+    "highlight.js": "0.8.x",
+    "memoizee": "~0.2.6",
+    "webmake": "~0.3.27"
+  },
+  "devDependencies": {
+    "webmake-middleware": "0.1.x"
+  },
+  "scripts": {
+    "start": "node server/index.js"
+  }
+}

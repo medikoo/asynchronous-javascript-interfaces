@@ -1,0 +1,946 @@
+<section>
+	<div class="content">
+		<h1>Asynchronous JavaScript Interfaces</h1>
+		<h2>and where we stand with ECMAScript 6</h2>
+		<h2>Mariusz Nowak</h2>
+		<p class="links">
+			<a href="http://github.com/medikoo"><img src="/github.png" height="100" /></a>
+			<a href="http://twitter.com/medikoo"><img src="/twitter.png" height="100" /></a>
+		</p>
+		<p class="footer">meetjs · March 2014 · Warsaw, Poland</p>
+	</div>
+
+	<aside>
+		<p>Events, Node callbacks, Generators, Promises, few words about Streams, plus notes on how ECMAScript 6 affects the landscape</p>
+		<hr />
+		<p>Made with <a href="http://markdalgleish.com/projects/bespoke.js/">Bespoke.js</a> engine developed by <a href="https://twitter.com/markdalgleish">Mark Dalgleish</a></p>
+		<p>See <a href="https://github.com/medikoo/asynchronous-javascript-interfaces">Github</a> for a source code of this presentation, and instructions on how to run it locally</p>
+		<p>You can toggle the notes by pressing the 'n' key</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="dom-events">
+	<div class="content">
+		<h1>DOM Events</h1>
+		<div class="substep" data-order="1">
+			<h2>EventTarget interface</h2>
+			<pre><code>// Register listener
+obj.addEventListener('load', listener = function (event) {
+  // Loaded
+});
+
+// Unregister listener
+obj.removeEventListener('load', listener);
+
+// Dispatch event
+obj.dispatchEvent('load', …args);</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p>Over the years we got used to DOM events as one fits all solution for all kinds of deferred handling.</p>
+		<p>No matter whether it was user actions (clicks, submissions), waiting for given state (<code>window.onload</code>, <code>img.onload</code>) or speaking to external resources (<code>XMLHttpRequest</code>, <code>IndexedDB</code>)</p>
+		<div class="substep" data-order="1">
+			<hr />
+			<p>Event emitter pattern fits perfectly repetitive actions, that can occur multiple times (or not happen at all), but its design is not perfectly suited for one time requests.</p>
+			<p>We missed dedicated interface for that.</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="node-callbacks">
+	<div class="content">
+		<h1>Node.js callbacks</h2>
+<pre class="substep" data-order="1"><code>getData(arg, function (err, data) {
+    <span class="substep" data-order="2">if (err) {
+      // Handle error
+      return;
+    }</span>
+    <span class="substep" data-order="3">// Process data</span>
+});</code></pre>
+	</div>
+	<aside>
+		<p>First to really break Event emitter (as a solution for everything) pattern was Node.js callbacks style</p>
+		<div class="substep" data-order="1">
+			<p>It's probably simplest representation of asynchronous request you can get, and it attributes to success of Node.js platform.</p>
+			<p>Asynchronous programming is mainly about speaking to external resources, which  makes error handling very important part of it. We can't blindly assume that remote server is up, or that given file on disk is accessible</p>
+		</div>
+		<p class="substep" data-order="2">Node callback style reserves first argument for eventual error object, that makes it hard to ignore. Error will remain silent only if you intentionally do nothing about it.</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="callback-hell">
+	<div class="content">
+		<h2>Callback Hell</h2>
+<pre><code>asyncFn1(input, function (err, result1) {
+    if (err) {
+        // Handle error
+        return;
+    }
+    <span class="substep" data-order="0">asyncFn2(result1, function (err, result2) {
+        if (err) {
+            // Handle error
+            return;
+        }
+        <span class="substep"> asyncFn3(result2, function (err, result3) {
+            if (err) {
+                // Handle error
+                return;
+            }
+            <span class="substep">asyncFn4(result3, function (err, result4) {
+                if (err) {
+                    // Handle error
+                    return;
+                }
+                <span class="substep">asyncFn5(result4, function (err, result5) {
+                    if (err) {
+                        // Handle error
+                        return;
+                    }
+                });</span>
+            });</span>
+        });</span>
+    });</span>
+});</code></pre>
+	</div>
+	<aside>
+		<p>Node callback represents simples possible form of asynchronous request, but it's composability is questionable</p>
+		<p class="substep" data-order="0">First thing that most of newcomers to Node approach is callback hell problem</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="callback-hell-aid">
+	<div class="content">
+		<h2>Callback Hell avoided</h2>
+		<div class="substep" data-order="1">
+			<p>See: <a href="http://callbackhell.com/">http://callbackhell.com/</a></p>
+			<pre><code>handle1 = function (err, result1) {
+    if (err) {
+        // Handle error
+        return;
+    }
+    asyncFn2(result1, handle2);
+};
+handle2 = function (err, result2) {
+    if (err) {
+        // Handle error
+        return;
+    }
+    asyncFn3(result2, handle3);
+};
+handle3 = function (err, result3) {
+    if (err) {
+        // Handle error
+        return;
+    }
+    // Process result3
+};
+asyncFn1(input, handle1);</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p>Still, there are ways to avoid infinite nesting</p>
+		<div class="substep" data-order="1">
+			<hr />
+			<p>Name your functions and define them outside of the callbacks.</p>
+			<p>It improves maintanance, but still composition of our flow doesn't reflect best possible readable form</p>
+		</div>
+	</aside>
+</section>
+
+
+<section data-bespoke-id="generators">
+	<div class="content">
+		<h1>ES6 Generators</h1>
+		<h2 class="substep tk-nimbus">Special kind of function that can be suspended and resumed</h2>
+		<div class="substep" data-order="1">
+			<h2>Technically an iterator</h2>
+			<pre><code>generatorFn = function* () {
+  yield 1;
+  yield 2;
+  yield 3;
+};
+var seq = generatorFn();
+seq.next(); // { value: 1, done: false }
+seq.next(); // { value: 2, done: false }
+seq.next(); // { value: 3, done: true }
+seq.next(); // { value: undefined, done: true }
+</code></pre>
+		</div>
+	</div>
+	<aside>
+		<div class="substep" data-order="1">
+			<p>Generator function returns an <code>iterator</code> object (another interface addition of ECMAScript 6)</p>
+			<p>Characteristic of iterator is very simple, it provides single <code>next</code> method, which when invoked returns plain object with two properties: <code>value</code> which returns next iterated value and <code>done</code> which says whether there are any more values to iterate.</p>
+			<p>For more details see following</p>
+			<ul>
+				<li><a href="http://www.2ality.com/2013/06/iterators-generators.html">2ality - Iterators and generators</a></li>
+				<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*">MDN Generators</a></li>
+			</ul>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="generators-co">
+	<div class="content">
+		<h2>Generators tricked to handle asynchronous requests sequentially</h2>
+		<div class="substep" data-order="1">
+			<h2>See: <a href="https://github.com/visionmedia/co">github.com/visionmedia/co</a></h2>
+			<pre><code>var co = require('co');
+var thunkify = require('thunkify');
+asyncFn1 = thunkify(asyncFn1);
+asyncFn2 = thunkify(asyncFn2);
+asyncFn3 = thunkify(asyncFn3);
+
+co(function* () {
+  result1 = yield asyncFn1(input);
+  result2 = yield asyncFn2(result1);
+  result3 = yield asyncFn2(result2);
+})();</code></pre>
+		</div>
+		<h2 class="substep">What's missing?</h2>
+	</div>
+	<aside>
+		<p>We can use suspend/resume functionality of generators to compose asynchronous flow linear way</p>
+		<div class="substep" data-order="1">
+			<p>This is exact idea behind the <a href="https://github.com/visionmedia/co">Co</a> module.</p>
+			<p>Co supports promises out of a box, but node callbacks need to be <a href="https://github.com/visionmedia/node-thunkify#thunkify"><i>thunkified</i></a> to work as expected.</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="generators-error-handling">
+	<div class="content">
+		<h2>Generators: Error handling</h2>
+		<div class="substep">
+			<p>Eventual errors are freely thrown</p>
+			<pre><code>co(function* () {
+  content = yield readFile('/not/existing/file');
+  // Error not handled, therefore <span class="crash">thrown unconditionally</span>
+})();</code></pre>
+			<div class="substep" data-order="1">
+				<p>Unless handled</p>
+				<pre class="substep" data-order="3" data-action="remove"><code>co(function* () {
+  try {
+    content = yield readFile('/not/existing/file');
+  } catch (e) {
+    // Handle error
+    return;
+  }<span class="substep" data-order="2" data-action="display">
+  try {
+    result2 = yield asyncFn2(content);
+  } catch (e) {
+    // Handle error
+    return;
+  }
+  try {
+    result3 = yield asyncFn3(result2);
+  } catch (e) {
+    // Handle error
+  }</span>
+})();</code></pre>
+				<pre class="substep" data-order="3" data-action="display"><code>co(function* () {
+  try {
+    result1 = yield asyncFn1(input);
+    result2 = yield asyncFn1(result1);
+    result3 = yield asyncFn1(result2);
+  } catch (e) {
+    // Handle eventual error
+  }
+})();</code></pre>
+			</div>
+		</div>
+	</div>
+	<aside>
+		<p class="substep" data-order="1">Errors are handled using traditional try/catch style</p>
+		<div class="substep" data-order="3" data-action="display">
+			<p>We can do better and address all errors with one handler</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="generators-parallel">
+	<div class="content">
+		<h2>Generators: Parallel handling</h2>
+<pre class="substep" data-order="0"><code>co(</span>function* () {
+  result1 = yield asyncFn1(input);
+  result23 = yield [asyncFn1(result1), asyncFn2(result3)];
+  result45 = yield {
+    result4: asyncFn4(result23[0]),
+    result5: asyncFn5(result23[1])
+  };
+})();</code></pre>
+	</div>
+	<aside>
+		<p>Asynchronous requests in strictly sequential form doesn't make much sense.</p>
+		<p>We benefit from asynchronicity only if we do something else in parralel. What about parallel asynchronicity then?</p>
+		<p class="substep" data-order="0">With Co we can configure parallel async operations with arrays or plain objects</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="generators-support">
+	<div class="content">
+		<h2>Generators: Support</h2>
+		<p>Node v0.11, with <code>--harmony-generators</code> flag</p>
+		<p>Hopefully in stable channel of all major browsers sometime next year</p>
+		<p>If you can't wait, see: <a href="http://facebook.github.io/regenerator/">Facebook's Regenerator</a></p>
+	</div>
+	<aside>
+		<p>See also <a href="https://github.com/lukehoban/ecmascript-asyncawait">Async functions</a> proposal for ECMAScript 7. It's generators-like syntax but dedicated for asynchronous handling.</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises">
+	<div class="content">
+		<h1>Promises</h1><br />
+		<h2 class="substep" data-order="0">WARNING:<br />Promises cannot be implemented<br /> without <em>compromises</em>,<br />therefore they come with <em>controversies</em></h2>
+	</div>
+	<aside>
+		<div class="substep" data-order="0" data-action="remove">
+			<p>Promises exist in JS land for some time already, but they were implemented in many different forms.</p>
+			<p>Starting from customized event emitters named promises, to jQuery chainable implemenation up to highly composable Promise/A+ implementations from which ECMAScript 6 version emerged.</p>
+			<p>This introduction will focus on Promise/A+ based design, as this one is most interesting, most powerful, and most importantly we'll have to deal with it in every ECMAScript 6 compliant engine.</p>
+		</div>
+		<div class="substep" data-order="0" data-action="display">
+			<p>Promises designed that way, while powerful, come with controversies, and cannot be implemented without breaking some good API design rules.</p>
+			<p>It's source of a mixed feelings about promises, and source of many different opinions on how promises should work.</p>
+			<p>This also makes every promise implementation to some extent opinionated, it's not different with one standardized for ECMAScript 6.</p>
+			<p>Similarly, this introduction is based on one of the opinions on how promises should be introduced, and you may find it different from ones you've read before.</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-object">
+	<div class="content">
+		<h2>Promise: an object representation of a value we can't obtain immediately</h2>
+		<div>
+			<p>Instead of providing a callback for a value:</p>
+			<pre><code>readFile(path, function (err, fileContent) { ... });</code></pre>
+			<div class="substep" data-order="0">
+				<p>We receive a promise object:</p>
+				<pre><code>var promise = readFile(path);</code></pre>
+			</div>
+		</div>
+	</div>
+	<aside class="substep" data-order="0">
+		<p>It allows to provide processing handler at any time you want, and not necesarily at the moment of initialization of asynchronous request</p>
+		<p>That way (similarily as in case of Events interface) promise object can be provided to many consumers, and not just central one tightly bound at initialization point</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-access-value">
+	<div class="content">
+		<h2>Promises: Access of resolved value</h2>
+		<p>Plain, no side-effects way, with <code>done</code></p>
+		<pre><code>promise.done(function (fileContent) {
+  // Process the value
+});</code></pre>
+		<p class="substep" data-order="0"><i>You may find some implementations not providing <code>done</code>, we'll discuss this issue later</i></p>
+	</div>
+	<aside>
+		<p>Requested value would be provided to callback passed to <code>done</code> method.</p>
+		<p>Our callback will be called only once, and more importantly it'll be called even if we attach it after our promise was resolved.</p>
+		<p>This is first important distinction that makes promises different from events interface</p>
+		<hr />
+		<p>If you're already familiar with promises and wonder why I'm not bringing <code>then</code> here. It's for a valid reason. <code>then</code> role extends beyond simple invocation of callback with a value, while <code>done</code> is designed purely for that.</p>
+		<p>I'll explain <code>then</code> in second step, on basis of <code>done</code>, logically such order is more correct.</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-error-handling">
+	<div class="content">
+		<h2>Promises: Error handling</h2>
+		<div class="substep" data-order="2" data-action="remove">
+			<div class="substep" data-order="0">
+				<h3>Controversy #1</h3>
+				<p>Error not exposed without handling</p>
+				<pre><code>readFile('/not/existing/path');
+// Error not handled, therefore not exposed (!)</code></pre>
+			</div>
+			<div class="substep" data-order="1">
+				<hr />
+				<p>When callback is attached, unhandled error is freely thrown</p>
+				<pre><code>readFile('/not/existing/path').done(function (fileContent) {
+  // Process the value (never called)
+});
+// Callback attached but error not handled,
+// therefore <span class="crash">thrown unconditionally</span></code></pre>
+			</div>
+		</div>
+		<div class="substep" data-order="2">
+			<p>Handle errors with second callback</p>
+			<pre><code>readFile('/not/existing/path').done(function (fileContent) {
+  // Process the value (never called)
+}, function (error) {
+  // Handle 'File not found' error
+});</code></pre>
+		</div>
+	</div>
+	<aside>
+		<div class="substep" data-order="2" data-action="remove">
+			<div class="substep" data-order="0">
+				<p>Most modern async API's throw unhandled errors, promises do not. It puts us step backwards to DOM events way of handling errors.</p>
+				<p>No handler equals no exposure</p>
+			</div>
+			<p class="substep" data-order="1">Things are a bit better though, it's enough to process the value to have error exposed (with DOM events we need to check for error directly to confirm that it has happened).</p>
+		</div>
+		<p class="substep" data-order="2">With promises we process success and failure results separately, with two different callbacks. It's especially useful with promise transformations which we'll get to later</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-learning-by-implementation">
+	<div class="content">
+		<h1>Learning by<br />implementation</h1>
+	</div>
+	<aside>
+		<p>Best way to understand how promises work, is by understanding it's internal algorithm, which in straigthforward form is quite simple</p>
+		<p>Implementation I'll base this introduction on,  doesn't follow any spec directly, but resembles exact behavior of Promise/A+ like (and in turn ECMAScript 6) implementations. It's all you need to understand, to be able to work with promises wihout confusion.</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-done-internals">
+	<div class="content">
+		<h2>Promise internals: <code>done</code></h2>
+		<div>
+			<pre><code>var Promise = function () {
+  <span class="substep" data-order="1">this._callbacks = [];</span>
+};
+Promise.prototype.done = function (onSuccess, onFail) {<span class="substep" data-order="0">
+  if (this._settled) {
+    this._release(onSuccess, onFail);
+  }<span class="substep" data-order="1"> else {
+    this._callbacks.push({ onSuccess: onSuccess,
+      onFail: onFail });
+  }</span></span>
+};
+<span class="substep" data-order="2">Promise.prototype._release = function (onSuccess, onFail) {
+  <span class="substep" data-order="3">if (this._failed) {
+    <span class="substep" data-order="4" data-action="display">if (typeof onFail === 'function') </span>onFail(this._value);
+    <span class="substep" data-order="5">else throw this._value;</span>
+  } else {
+    <span class="substep" data-order="4" data-action="display">if (typeof onSuccess === 'function') </span>onSuccess(this._value);
+  }</span>
+};</span></code></pre>
+			<p class="substep" data-order="6">There's one issue in above logic. What's that?</p>
+		</div>
+	</div>
+	<aside>
+		<p class="substep" data-order="0" data-action="remove">Before I'll show how promise objects can be constructed, let's check internal implementation of <code>done</code></p>
+		<p class="substep" data-order="0">If promise value is already settled, we can release callbacks right away.</p>
+		<p class="substep" data-order="1">Otherwise, we need to keep them, so we can process them after value is obtained</p>
+		<p class="substep" data-order="2">Let's look at internal <code>_release</code> logic:</p>
+		<p class="substep" data-order="3">If promise was rejected <code>onFail</code> is invoked, otherwise it's <code>onSuccess</code>. In all cases only one callback is invoked</p>
+		<p class="substep" data-order="4">Both callbacks are optional.</p>
+		<div class="substep" data-order="5">
+			<p>If promise was rejected, and <code>onFail</code> callback was not provided <span class="crash">rejection error is freely thrown</span></p>
+			<p>In case of success, if <code>onSuccess</code> is not provided, no action is pursued</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-done-duplicity">
+	<div class="content">
+		<h2>Duplicity of `done`</h2>
+		<div class="substep" data-order="0">
+			<p>Only possible fix is introduction of artificial asynchronicity:</p>
+			<pre><code>Promise.prototype.done = function (onSuccess, onFail) {
+  if (this._resolved) {
+<mark>    setTimeout(this._release.bind(this, onSuccess, onFail), 0);    </mark>
+  } else {
+    this._callbacks.push({ onSuccess: onSuccess, onFail: onFail });
+  }
+};</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p>One of the agreed API design rules, is that function which takes callback, should at all times either call it before it returns (immediatelly) or call it after it returns (at some point in future).</p>
+		<p>Our implementation breaks that rule, <code>done</code> will invoke callback immediately when promise is resolved and in future turn if it's not resolved</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-zalgo-deferrals">
+	<div class="content">
+		<h2>Controversy #2</h2>
+		<h2>Release the Zalgo<br />or deal with<br />Synthetic Deferrals</h2>
+		<p class="lone">See: <a href="http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony">Designing APIs for Asynchrony</a><br />by Isaac Schlueter</p>
+	</div>
+	<aside>
+		<p>Incosistent handling of callbacks (coined as a <a href="http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony">release&nbsp;of&nbsp;Zalgo</a>) is widely considered as a bad API design.</p>
+		<p>In turn synthetic deferrals became widely accepted solution, it was adopted by Promise/A+, so majority of libraries and then by ECMAScript 6 implementation.</p>
+		<p>Drawback of that is that having resolved promise we're not able to access its value sync way, and there's no other public API method proposed to complement that.</p>
+		<hr />
+		<p>Speaking from personal experience: I worked with both ways of handling, initially with synthetic deferrals, and then having performance issues experimentally I switched to zalgo version. I didn't run into any issues and it felt cleaner so I decided to stick to that. Still, it's rare approach, and not many promise libraries do that.</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-deferred">
+	<div class="content">
+		<h2>Constructing promises #1</h2>
+		<div class="substep" data-order="0">
+			<h2>Deferred & Promise</h2>
+			<pre><code>Deferred = function () { this.promise = new Promise(); };
+
+Deferred.prototype = {
+  resolve: function (value) { this.promise._resolve(value); },
+  reject: function (value) { this.promise._reject(value); }
+};</code></pre>
+		</div>
+		<div class="substep" data-order="1">
+			<p>Example usage:</p>
+			<pre><code>readFilePromised = function (path) {
+  var deferred = new Deferred();
+  readFile(path, function (err, content) {
+    if (err) deferred.reject(err);
+    else deferred.resolve(content);
+  });
+  return deferred.promise;
+};</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p>Early JavaScript implementations constructed promise objects that exposed both: methods to resolve the promise and methods to register callback for the value.</p>
+		<p>When passing such promise object to a consumer, we were also providing methods to resolve the promise, which didn't seem right.</p>
+		<div class="substep" data-order="0">
+			<p><a href="http://youtu.be/IbDF3UdgOb0?t=16m31s">Kris Kowal with his Q implementation proposed separation of resolver and consumer concerns with two: deferred and promise interfaces</a></p>
+			<p>This pattern was followed by many other Promise/A+ like implementations afterwards</p>
+		</div>
+		<div class="substep" data-order="1">
+			<hr />
+			<p>Example shows how to implement promise version of node's readFile with Deferred constructor (internally handling node style callback).</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-constructor">
+	<div class="content">
+		<h2>Constructing promises #2</h2>
+		<div class="substep" data-order="1">
+			<h2>Constructor pattern</h2>
+			<p>See: <a href="http://domenic.me/2014/02/14/the-revealing-constructor-pattern/">The Revealing Constructor Pattern</a> by Domenic Denicola</p>
+			<pre><code>Promise = function (executor) {
+  ...
+  executor(this._resolve.bind(this), this._reject.bind(this));
+};</code></pre>
+		</div>
+		<div class="substep">
+			<p>Example usage:</p>
+			<pre><code>readFilePromised = function (path) {
+  return new Promise(function (resolve, reject) {
+    readFile(path, function (err, content) {
+      if (err) reject(err);
+      else resolve(content);
+    });
+  });
+};</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p>Deferred/promise pattern was adopted by many implementations, but when first serious talks about standarization of promises began, it was clear that promises can't be specified in that form</p>
+		<p>Standard ECMAScript way is to have one constructor with a prototype. How to achieve that and do not resign from separation that deferred/promise pattern provided?</p>
+		<div class="substep" data-order="1">
+			<p>Trick we can do, is to design Promise constructor so it takes an <code>executor</code> callback, which is called immediately at initialization with <code>resolve</code> and <code>reject</code> functions which are not exposed on created promise instance.</p>
+			<p>It's hacky solution, not seen so far in any other interface, but it solves the issue, and was accepted for ECMAScript 6 implementation</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-resolution">
+	<div class="content">
+		<h2>Promise internals: Resolution</h2>
+		<pre><code>Promise.prototype._resolve = function (value) {
+  <span class="substep" data-order="0">if (this._resolved) return;
+  this._resolved = true;</span><span class="substep" data-order="2" data-action="remove">
+  <span class="substep" data-order="1">this._settle(value);</span></span><span class="substep" data-order="2" data-action="display">
+  if (value instanceof Promise) {
+    // <b class="substep" data-order="3" data-action="display">Controversy #3: </b>Recursive assimilation
+    value.done(this._settle.bind(this), function (error) {
+      this._failed = true;<span class="substep" data-order="4">// Rejected via resolve</span>
+      this._settle(error);
+    }.bind(this));
+  } else {
+    this._settle(value);
+  }</span>
+};
+<span class="substep" data-order="5">Promise.prototype._reject: function (value) {
+  if (this._resolved) return;
+  this._resolved = true;
+  this._failed = true;
+  this._settle(value);
+};</span>
+<span class="substep" data-order="6">Promise.prototype._settle = function (value) {
+  this._settled = true;
+  this._value = value;<span class="substep" data-order="7" data-action="remove">
+  this._callbacks.forEach(function (data) {
+    this._release(data.onSuccess, data.onFail);
+  }, this);</span><span class="substep" data-order="7" data-action="display">
+  // <b>Controversy #4:</b> Release after `resolve` or `reject` returns
+  setTimeout([].forEach.bind(this._callbacks, function (data) {
+    this._release(data.onSuccess, data.onFail);
+  }, this), 0);</span>
+}</span></code></pre>
+	</div>
+	<aside>
+		<div class="substep" data-order="3" data-action="remove">
+			<p>What's happening internally when we resolve or reject the promise?</p>
+			<p class="substep" data-order="0">Promise can be resolved only once, any further <code>resolve</code> call is ignored</p>
+			<p class="substep" data-order="1">Promise is settled with value... but what if value is another promise?</p>
+			<p class="substep" data-order="2">Power of promises lies in its composability. If promise is resolved with another promise it'll wait until that promise is settled and settle with same value.</p>
+		</div>
+		<div class="substep" data-order="4" data-action="remove">
+			<div class="substep" data-order="3">
+				<p>(...)</p>
+				<p>This behavior caused some stir. Promises resemble some characteristics of a monads, which attracted developers coming from functional languages, still recursive assimilation plays against monadic laws, so doing that felt wrong. Check following for more details:</p>
+				<ul>
+					<li><a href="https://github.com/promises-aplus/promises-spec/issues/94">Incorporate monads</a></li>
+					<li><a href="http://mozilla.6506.n7.nabble.com/Promise-cast-and-Promise-resolve-td305897i20.html">Promise.cast and Promise.resolve</a></li>
+				</ul>
+				<p>Speaking from my personal experiences: we're never interested in promise objects, but resolved values, so such assimilation is highly desirable.</p>
+				<p>Recursive assimilation is also done in ECMAScript 6 promises</p>
+				<p>(...)</p>
+			</div>
+		</div>
+		<div class="substep" data-order="4" data-action="display">
+			<p>(...)</p>
+			<p>Interesting case of <b>resolution</b> with a promise object is that if provided promise was rejected, our promise will also be rejected. It doesn't matter we called <code>resolve</code> and not <code>reject</code> initially</p>
+			<p class="substep" data-order="5">Reject logic is more straightforward as there's no assimilation of eventual promise value. It's totally fine as rejection with a promise is not logical. Same as we throw error instances in synchronous code, we should reject promises only with error objects.</p>
+			<p class="substep" data-order="6">When final value is settled, we invoke registered callbacks, with previously explained release logic.</p>
+			<div class="substep" data-order="7">
+				<p>There's an opinion, that callbacks should not be released before <code>resolve</code> or <code>reject</code> returns. To achieve that we need to further postpone release operation.</p>
+				<p>ECMAScript 6 implementation follows that</p>
+			</div>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="promise-then">
+	<div class="content">
+		<h2>Promise transformations: <code>then</code></h2>
+		<div class="substep" data-order="0">
+			<pre><code>// Get YAML file
+var ymlPromise = readFile('some.yml');
+
+// Transform YAML string to JSON object
+var jsonPromise = ymlPromise.then(ymlToJson);
+// ...
+jsonPromise.done(function (json) {
+  // Process JSON result
+});</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p>Greatest power of promises lie in transformations that we can configure with <code>then</code></p>
+		<p>We can create a promise of a value that's a result of transformation on not yet obtainted value.</p>
+		<div class="substep" data-order="1">
+			<p>Example shows YAML file read to memory and then transformed to JSON. Note that <code>someJsonPromise</code> is obtained immediately, even before we have content of YAML file.</p>
+		</div>
+	</aside>
+</section>
+
+ <section data-bespoke-id="promises-then-error">
+	<div class="content">
+		<h2>Transformations: Rejection into success</h2>
+		<p>Through transformations we can recover from errors back to success values</p>
+		<p class="substep" data-order="0">What if YAML file is optional, and in case of issues we want to fallback to an empty object?</p>
+		<div class="substep" data-order="0">
+			<pre><code>// Get YAML file
+var ymlPromise = readFile('some.yml');
+
+// Transform YAML string to JSON object
+var jsonPromise = ymlPromise.then(ymlToJson<span class="substep" data-order="3" data-action="remove">, function (err) {
+  // YAML file not be accessible, fallback to an empty object
+  return {};
+})<span class="substep" data-order="2" data-action="display">.then(null, function (err) {
+  // Conversion to JSON failed, fallback to an empty object
+  return {};
+})</span></span><span class="substep" data-order="3" data-action="display">).<span class="substep" data-order="4" data-action="remove">then(null, </span><span class="substep" data-order="4" data-action="display">catch(</span>function (err) {
+  // YAML inaccessible or invalid, fallback to an empty object
+  return {};
+})</span>);</code></pre>
+		</div>
+		<div class="substep" data-order="3" data-action="remove">
+			<p class="substep" data-order="1">...what about YAML parse errors?</p>
+			<p class="substep" data-order="2.5">...let's unify the handlers</p>
+		</div>
+		<p class="substep" data-order="4"><code>promise.then(null, cb)</code> => <code>promise.catch(cb)</code></<p>
+	</div>
+	<aside>
+		<p class="substep" data-order="3">Both <code>then</code> callbacks are optional, and if not provided, resolved value just passes through and becomes a value of transformation promise. That way we can catch all errors at the end of chain and address them with same handler</p>
+		<div class="substep" data-order="4">
+			<p>There's also <code>.catch(onFail)</code> sugar. It's same as doing <code>.then(null, onFail)</code></p>
+			<hr />
+			<p>Some tutorials promote <code>catch</code> as end of chain error handler, which is not perfectly right.</p>
+			<p>Note that <code>catch</code> same as <code>then</code>, returns another promise and swallows eventual callback error into returned promise rejection value.</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-then-reject">
+	<div class="content">
+		<h2>Transformations: Success into rejection</h2>
+		<div class="substep" data-order="0">
+			<p>Reject with throw:</p>
+			<pre class=""><code>var jsonPromise = readFile('some.yml').then(ymlToJson)
+  .then(function (json) {
+    if (!json.db) throw new Error("No db config provided!");
+  });
+// ...
+promise.done(function (json) {
+  // Process JSON (invoked only if json.db exists)
+  initDb(json.db);
+});</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p class="substep" data-order="0">To reject a success value, we need to throw an error within transformation callback.</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-nested">
+	<div class="content">
+		<h2>Asynchronous transformations</h2>
+		<div class="substep" data-order="0">
+			<p>Save YAML to JSON transformation into a JSON file</p>
+			<pre><code>readFile('some.yml').then(function (content) {
+  return writeFile('some.json', JSON.stringify(ymlToJson(content)));
+}).done(function () {
+  // JSON saved
+});</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p>We can invoke asynchronous transformations, for that just return a promise from a callback</p>
+		<div class="substep" data-order="0">
+			<p>In an example, <code>writeFile</code> returns another promise which resolves after file is successfully saved (or becomes rejected if file couldn't be saved). Its resolution value and state is assimilated by promise returned by <code>then</code>.</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-then-internals">
+	<div class="content">
+		<h2>Promise internals: <code>then</code></h2>
+		<pre><code>Promise.prototype.then = function (onSuccess, onFail) {<span class="substep" data-order="0">
+  <span class="substep" data-order="1">var parent = this;</span>
+  return new Promise(function (resolve, reject) {
+    <span class="substep" data-order="1">parent.done(function (value) {
+      if (typeof onSuccess === 'function') {
+<mark class="substep" data-order="5" data-action="mark">        <span class="substep" data-order="3" data-action="remove"><span class="substep" data-order="2" data-action="display">value = </span>onSuccess(value);</span><span class="substep" data-order="3" data-action="display">try { value = onSuccess(value); }                          
+        catch (e) { reject(e); return; }</span>                           </mark>
+      }
+      <span class="substep" data-order="2">resolve(value);</span>
+    }, function (value) {
+      if (typeof onFail === 'function') {
+<mark class="substep" data-order="5" data-action="mark">        </mark><span class="substep" data-order="3" data-action="remove"><mark class="substep" data-order="4" data-action="mark"><span class="substep" data-order="2" data-action="display">resolve(</span>onFail(value)<span class="substep" data-order="2" data-action="display">)</span>;</mark></span><span class="substep" data-order="3" data-action="display"><mark class="substep" data-order="5" data-action="mark">try { value = onFail(value); }                             
+        catch (e) { reject(e); return; }                           </mark>
+        resolve(value);</span><span class="substep" data-order="2" data-action="display">
+      } else {
+        reject(value);</span>
+      }
+    });</span>
+  });</span>
+};</code></pre>
+		<p class="substep" data-order="4">See <a href="https://github.com/medikoo/plain-promise">github.com/medikoo/plain-promise</a> for complete implementation</p>
+	</div>
+	<aside>
+		<p class="substep" data-order="0"><code>then</code> returns another promise.</p>
+		<p class="substep" data-order="1">When parent promise settles, input callbacks (optional) are invoked with resolved value...</p>
+		<p class="substep" data-order="2">...value returned by callback becomes a resolution of promise returned by <code>then</code>. If callback was not provided state and resolved value is assimilated from parent promise.</p>
+		<p class="substep" data-order="3">In case callback crashes, returned promise is rejected with thrown error</p>
+		<div class="substep" data-order="5">
+			<hr />
+			<p>Last mentioned behavior is especially important if for some reason you do not plan to process promise returned by <code>then</code>. See that eventual crash (not necesarry expected) is swallowed and will be exposed only if you process returned promise</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-error-swallowing">
+	<div class="content">
+		<h2><code>then</code> (and <code>catch</code>) swallow errors</h2>
+		<pre><code>somePromise.then(function (value) {
+  // ...value processing...
+  someArr.<span class="warning">froEach</span>(function () { // Execution broken silently
+    // ...
+  });
+});</code></pre>
+		<div class="substep" data-order="0">
+			<p>Use <code>then</code> only if you want to map value into other result, for pure access stay with <code>done</code>.</p>
+			<pre><code>somePromise.done(function (value) {
+  // ...value processing...
+  someArr.<span class="crash">froEach</span>(function () { // Uncoditional crash
+    // ...
+  });
+});</code></pre>
+			<p>Best way to think of <code>then</code> and <code>done</code> is as of array's <code>map</code> and <code>forEach</code>.</p>
+		</div>
+	</div>
+	<aside>
+	</aside>
+</section>
+
+<section data-bespoke-id="promises-then-done">
+	<div class="content">
+		<h2>Controversy #5: Some implementations do not provide <code>done</code></h2>
+		<p class="substep" data-order="0"><code>then</code> was first with already defined role<br />Error swallowing was addressed on top of that</p>
+		<div class="substep" data-order="1">
+			<ul>
+				<li><p>Intially in <a href="https://github.com/kriskowal/q">Q</a>, end chain with <code>end</code></p>
+					<pre><code>somePromise.then(function (value) {
+  someArr.froEach(function () { ... });
+}).end(); // Swallowed <span class="crash">exception re-thrown</span></code></pre></li>
+				<li class="substep" data-order="2"><p>Unhandled exceptions monitor</p>
+					<pre><code>Possibly unhandled TypeError: undefined is not a function</code></pre></li>
+				<li class="substep" data-order="3"><p><code>done</code> as addition to <code>then</code>, to be used <b>instead</b>, where transformation is not needed</p>
+					<pre><code>somePromise.done(function (value) {
+  someArr.froEach(function () { ... });
+});// Unhandled <span class="crash">exception freely thrown</span></code></pre></li>
+			</ul>
+		</div>
+	</div>
+	<aside>
+		<div class="substep" data-order="1" data-action="remove">
+			<p>To explain reasoning, we need to see how design evolved</p>
+			<div class="substep" data-order="0">
+				<p>In CommonJS and Promise/A+ group discussions <code>then</code> was designed and discussed before <code>done</code> was seriously considered</p>
+				<p>It had major focus, was the only one and automatically was coined as <b>all purpose</b> value access function</p>
+				<p>After error swallowing issue got exposed, nobody considered taking a step back to redefine role of <code>then</code></p>
+			</div>
+		</div>
+		<div class="substep" data-order="1" data-action="display">
+			<p>(...)</p>
+			<p>Still this issue had to be addressed, and over time some solutions have been proposed</p>
+			<ul>
+				<li><code>.end()</code> was criticized, as something that must be added which can be easily forgotten</li>
+				<li class="substep multi-link" data-order="2">Monitoring, popular and by many claimed as the only right solution, unfortunately it's vulnerable to false positives (it actually detects "Possibly unhandled exceptions"), increases complexity of implementation, and can be source of
+					<a href="https://github.com/cujojs/when/issues/194">m</a><a href="https://github.com/petkaantonov/bluebird/issues/148">a</a><a href="https://github.com/petkaantonov/bluebird/issues/142">n</a><a href="https://github.com/kriskowal/q/issues/474">y</a>
+					<a href="https://github.com/cujojs/when/issues/203">o</a><a href="https://github.com/petkaantonov/bluebird/issues/135">t</a><a href="https://github.com/petkaantonov/bluebird/issues/132">h</a><a href="https://github.com/petkaantonov/bluebird/issues/126">e</a><a href="https://github.com/petkaantonov/bluebird/issues/118">r</a>
+					<a href="https://github.com/petkaantonov/bluebird/issues/100">i</a><a href="https://github.com/petkaantonov/bluebird/issues/79">s</a><a href="https://github.com/kriskowal/q/issues/278">s</a><a href="https://github.com/kriskowal/q/issues/299">u</a><a href="https://github.com/kriskowal/q/issues/238">e</a><a href="https://github.com/cujojs/when/issues/186">s</a>.
+				</li>
+				<li class="substep" data-order="3"><code>done</code> implemented in most of the libraries (In Q it replaced <code>end</code>). Still, by many it's mistakenly understood as <code>end</code> (something you <b>add</b>). Just few libraries implement it optimally.</li>
+			</ul>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="es6-promises">
+	<div class="content">
+		<h2>ECMAScript 6 Promises</h2>
+		<p>No <code>done</code> and no solution for error swallowing specified</p>
+		<p class="substep">Proposed to be solved by "Unhandled rejection tracking functionality within dev tools"</p>
+		<p class="substep">Too hard for Chrome: <a href="https://code.google.com/p/v8/issues/detail?id=3093">V8[3094]: Debugging promises</a></p>
+		<p class="substep">No sign of it from other browsers, and not really possible in non browser engines, e.g. Node.js, Adobe Photoshop or <a href="http://www.duktape.org/">Duktape</a></p>
+		<div class="substep">
+			<hr />
+			<p>The only safe way to work with ES6 promises:</p>
+			<pre><code>es6Promise.then(function (value) {
+  setTimeout(function () { /* Safe here */ }, 0);
+}, function (error) {
+  setTimeout(function () { /* Safe here */ }, 0);
+});</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p>ECMAScript 6 promises come with no plain access method and implied error swallowing.</p>
+		<p>(It's additionally frustrating when we realize there are functions with much less importance like <code>catch</code> to ocasionally save few characters of typing, or <code>race</code> with not known real use case.)</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="to-done-or-not-to-done">
+	<div class="content">
+		<h2>To <code>done</code>, or not to <code>done</code></h2>
+		<ul>
+			<li><a href="https://github.com/promises-aplus/promises-spec/issues/43">github.com/promises-aplus/promises-spec/issues/43</a></li>
+			<li><a href="https://github.com/slightlyoff/Promises/issues/33">github.com/slightlyoff/Promises/issues/33</a></li>
+			<li><a href="http://mozilla.6506.n7.nabble.com/Where-d-Promise-done-go-td281461.html">mozilla.6506.n7.nabble.com/Where-d-Promise-done-go</a></li>
+			<li><a href="https://github.com/domenic/promises-unwrapping/issues/19">github.com/domenic/promises-unwrapping/issues/19</a></li>
+		</ul>
+	</div>
+	<aside></aside>
+</section>
+
+<section data-bespoke-id="limitations-of-one-callback-handling">
+	<div class="content">
+		<h2>Limitations of one "when finished" callback handling</h2>
+		<div class="substep" data-order="0">
+			<p>Copying large file:</p>
+			<pre><code>readFile('few-gigs-file.zip', function (err, data) {
+  if (err) throw err;
+  // Whole file in process memory!
+  writeFile('few-gigs-file-copy.zip', function (err) {
+    if (err) throw err;
+  });
+});</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p>Asynchronous handling that we do with callbacks, is still in some sense <i>blocking</i></p>
+		<p>We wait until whole bulk of data is ready, and only after the we have it in complete form, we process it.</p>
+		<div class="substep" data-order="0">
+			<p>It's not efficient and can raise issues when we deal with large data.</p>
+			<hr />
+			<p>What if we could process data that we recieve from external source on the go, right when it starts to arrive to our end?</p>
+		</div>
+	</aside>
+</section>
+
+<section data-bespoke-id="streams">
+	<div class="content">
+		<h1>Streams</h1>
+		<h2>Another great contribution by Node.js</h2>
+		<div class="substep" data-order="0">
+			<p>Copying large file:</p>
+			<pre><code>createReadStream('few-gigs-file.zip')
+  .pipe(createWriteStream('few-gigs-file-copy.zip'));</code></pre>
+			<p>Memory footprint is minimal</p>
+		</div>
+	</div>
+	<aside>
+		<p>Streams are event emitters, but as we deal with repetetive events it makes sense.</p>
+		<p>With streams we have full control over our request. We can stop requests at any time e.g. after having a half of requested content</p>
+		<p>We can also immediately transform it to another stream</p>
+		<p class="substep" data-order="0">In file copy example, memory footprint is minimal, as what we read is immediatelly flushed into created file copy</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="streams-error-handling">
+	<div class="content">
+		<h2>Streams: Error handling</h2>
+		<div class="substep" data-order="0">
+			<p>If unhandled, errors are freely thrown</p>
+			<pre><code>fs.createReadStream('not/existing/path.txt');
+// Error not handled, therefore <span class="crash">thrown unconditionally</span></code></pre>
+		</div>
+		<div class="substep">
+			<p>Error can be handled with attachment of `error` event listener</p>
+			<pre><code>var fileStream = fs.createReadStream('not/existing/path.txt');
+fileStream.on('error', function (error) {
+  // Handle error
+});</code></pre>
+		</div>
+	</div>
+	<aside>
+		<p class="substep" data-order="0">No error swallowing implied</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="streams-complexity">
+	<div class="content">
+		<h2>Complexity of streams</h2>
+		<p class="substep" data-order="0">Node.js <a href="http://nodejs.org/api/all.html#all_stream">Streams API</a> changed over time, and still seems as not finally settled</p>
+		<p class="substep" data-order="1">There's a standarization effort <a href="https://github.com/whatwg/streams">Streams for Web</a>, conducted by Domenic Denicola</p>
+	</div>
+	<aside>
+		<p>Streams are complex</p>
+		<p>We can have readable, writable, or a duplex (both readable and writable) streams. Additionally we can control streams throughput</p>
+		<p>I'm not going to get deep into that as this meant to be a very basic introdction</p>
+	</aside>
+</section>
+
+<section data-bespoke-id="thank-you">
+	<div class="content">
+		<h1>Thank you!</h1>
+		<h2>Mariusz Nowak</h2>
+		<p class="links">
+			<a href="http://github.com/medikoo"><img src="/github.png" height="100" /></a>
+			<a href="http://twitter.com/medikoo"><img src="/twitter.png" height="100" /></a>
+		</p>
+	</div>
+	<aside></aside>
+</section>

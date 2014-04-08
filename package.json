@@ -11,6 +11,7 @@
     "bespoke-touch": "0.1.x",
     "connect": "~2.14",
     "deferred": "~0.6.8",
+    "es5-ext": "~0.9.2",
     "highlight.js": "0.8.x",
     "memoizee": "~0.2.6",
     "webmake": "~0.3.27"

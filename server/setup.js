@@ -1,6 +1,7 @@
 'use strict';
 
-var deferred = require('deferred')
+var count    = require('es5-ext/lib/Object/count')
+  , deferred = require('deferred')
   , resolve  = require('path').resolve
   , webmake  = require('webmake')
 
@@ -8,6 +9,12 @@ var deferred = require('deferred')
   , clientBundle = resolve(__dirname, '../public/main.js');
 
 module.exports = function (env) {
+	var promise;
 	if (env.dev) return deferred(null);
-	return webmake(clientProgram, { output: clientBundle });
+	return (promise = webmake(clientProgram, { output: clientBundle })
+		.aside(function () {
+			console.log("Webmake OK [" + promise.parser.modulesFiles.length +
+				" modules from " + count(promise.parser.packages) + " packages in " +
+				(promise.time / 1000).toFixed(2) + "s]");
+		}));
 };

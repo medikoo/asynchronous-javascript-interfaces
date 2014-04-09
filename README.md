@@ -1,12 +1,13 @@
 # Asynchronous JavaScript Interfaces
 ## March 2014, [meet.js](http://www.meetjs.pl) presentation slides & notes
-Viewable at [medikoo.com/asynchronous-javascript-interfaces](http://medikoo.com/asynchronous-javascript-interfaces/?notes)
+
+Published at [medikoo.com/asynchronous-javascript-interfaces](http://medikoo.com/asynchronous-javascript-interfaces/?notes)
 
 Made with [Bespoke.js](https://github.com/markdalgleish/bespoke.js) presentation engine and following plugins: [history](https://github.com/medikoo/bespoke-history#bespoke-history), [keys](https://github.com/markdalgleish/bespoke-keys#bespoke-keys), [notes](https://github.com/medikoo/bespoke-notes#bespoke-notes), [progress](https://github.com/markdalgleish/bespoke-progress#bespoke-progress), [substeps](https://github.com/medikoo/bespoke-substeps#bespoke-substeps), [sync](https://github.com/medikoo/bespoke-substeps#bespoke-sync), [touch](https://github.com/markdalgleish/bespoke-touch#bespoke-touch)
 
 See also [plain-promise](https://github.com/medikoo/plain-promise) simplified (educational) implementation of promises made for this presentation to explain promises to newcomers
 
-### To view presentation locally
+### To install & view presentation locally
 
 	$ npm install
 	$ npm start

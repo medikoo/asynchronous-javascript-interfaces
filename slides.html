@@ -15,7 +15,7 @@
 		<hr />
 		<p>Made with <a href="http://markdalgleish.com/projects/bespoke.js/">Bespoke.js</a> engine developed by <a href="https://twitter.com/markdalgleish">Mark Dalgleish</a></p>
 		<p>See <a href="https://github.com/medikoo/asynchronous-javascript-interfaces">Github</a> for a source code of this presentation, and instructions on how to run it locally</p>
-		<p>You can toggle the notes by pressing the 'n' key</p>
+		<p>You can toggle presentation notes by pressing the 'n' key</p>
 	</aside>
 </section>
 
@@ -334,7 +334,7 @@ co(function* () {
 		<pre><code>promise.done(function (fileContent) {
   // Process the value
 });</code></pre>
-		<p class="substep" data-order="0"><i>You may find some implementations not providing <code>done</code>, we'll discuss this issue later</i></p>
+		<p class="substep" data-order="0"><i>You may find some implementations not providing <code>done</code>, we'll discuss this case later</i></p>
 	</div>
 	<aside>
 		<p>Requested value would be provided to callback passed to <code>done</code> method.</p>
@@ -431,7 +431,7 @@ Promise.prototype.done = function (onSuccess, onFail) {<span class="substep" dat
 		<p class="substep" data-order="3">If promise was rejected <code>onFail</code> is invoked, otherwise it's <code>onSuccess</code>. In all cases only one callback is invoked</p>
 		<p class="substep" data-order="4">Both callbacks are optional.</p>
 		<div class="substep" data-order="5">
-			<p>If promise was rejected, and <code>onFail</code> callback was not provided <span class="crash">rejection error is freely thrown</span></p>
+			<p>If promise was rejected, and <code>onFail</code> callback was not provided <span class="crash">rejection error is thrown</span></p>
 			<p>In case of success, if <code>onSuccess</code> is not provided, no action is pursued</p>
 		</div>
 	</aside>
@@ -439,7 +439,7 @@ Promise.prototype.done = function (onSuccess, onFail) {<span class="substep" dat
 
 <section data-bespoke-id="promises-done-duplicity">
 	<div class="content">
-		<h2>Duplicity of `done`</h2>
+		<h2>Duplicity of <code>done</code></h2>
 		<div class="substep" data-order="0">
 			<p>Only possible fix is introduction of artificial asynchronicity:</p>
 			<pre><code>Promise.prototype.done = function (onSuccess, onFail) {
@@ -500,12 +500,12 @@ Deferred.prototype = {
 		<p>Early JavaScript implementations constructed promise objects that exposed both: methods to resolve the promise and methods to register callback for the value.</p>
 		<p>When passing such promise object to a consumer, we were also providing methods to resolve the promise, which didn't seem right.</p>
 		<div class="substep" data-order="0">
-			<p><a href="http://youtu.be/IbDF3UdgOb0?t=16m31s">Kris Kowal with his Q implementation proposed separation of resolver and consumer concerns with two: deferred and promise interfaces</a></p>
+			<p><a href="http://youtu.be/IbDF3UdgOb0?t=16m31s">Kris Kowal with Q implementation proposed separation of resolver and consumer concerns with two: deferred and promise interfaces</a></p>
 			<p>This pattern was followed by many other Promise/A+ like implementations afterwards</p>
 		</div>
 		<div class="substep" data-order="1">
 			<hr />
-			<p>Example shows how to implement promise version of node's readFile with Deferred constructor (internally handling node style callback).</p>
+			<p>Example shows how to implement promise version of node's <code>readFile</code> with <code>Deferred</code> constructor (internally handling node style callback).</p>
 		</div>
 	</aside>
 </section>
@@ -582,8 +582,8 @@ Deferred.prototype = {
 		<div class="substep" data-order="3" data-action="remove">
 			<p>What's happening internally when we resolve or reject the promise?</p>
 			<p class="substep" data-order="0">Promise can be resolved only once, any further <code>resolve</code> call is ignored</p>
-			<p class="substep" data-order="1">Promise is settled with value... but what if value is another promise?</p>
-			<p class="substep" data-order="2">Power of promises lies in its composability. If promise is resolved with another promise it'll wait until that promise is settled and settle with same value.</p>
+			<p class="substep" data-order="1">Promise is settled with a value... but what if value is another promise?</p>
+			<p class="substep" data-order="2">Power of promises lie in its composability. If promise is resolved with another promise it'll wait until that promise is settled and settle with same value.</p>
 		</div>
 		<div class="substep" data-order="4" data-action="remove">
 			<div class="substep" data-order="3">
@@ -613,6 +613,7 @@ Deferred.prototype = {
 
 <section data-bespoke-id="promise-then">
 	<div class="content">
+		<h2>Constructing promises #3</h2>
 		<h2>Promise transformations: <code>then</code></h2>
 		<div class="substep" data-order="0">
 			<pre><code>// Get YAML file
@@ -838,7 +839,7 @@ promise.done(function (json) {
 	</div>
 	<aside>
 		<p>ECMAScript 6 promises come with no plain access method and implied error swallowing.</p>
-		<p>(It's additionally frustrating when we realize there are functions with much less importance like <code>catch</code> to ocasionally save few characters of typing, or <code>race</code> with not known real use case.)</p>
+		<p>(It's additionally frustrating when we realize there are functions with much less importance like <code>catch</code> to occasionally save few characters of typing, or <code>race</code> with not known real use case)</p>
 	</aside>
 </section>
 

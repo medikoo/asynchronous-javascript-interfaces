@@ -34,7 +34,13 @@ module.exports = function (env) {
 		webmakeOpts[root + 'main.js'] = programPath;
 		app.use(require('webmake-middleware')(webmakeOpts, { log: true }));
 	}
-	if (env.sync) app.use(require('bespoke-sync/server')({ log: true }));
+	if (env.sync) {
+		app.use(require('bespoke-sync/server')({
+			log: true,
+			ssePath: root + 'sse-slides/',
+			xhrPath: root + 'slide/'
+		}));
+	}
 
 	app.use(function (req, res, next) {
 		var pathname = parse(req.url).pathname;

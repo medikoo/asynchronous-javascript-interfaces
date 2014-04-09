@@ -327,7 +327,7 @@ co(function* () {
 	</aside>
 </section>
 
-<section data-bespoke-id="promises-access-value">
+<section data-bespoke-id="promises-value-access">
 	<div class="content">
 		<h2>Promises: Access of resolved value</h2>
 		<p>Plain, no side-effects way, with <code>done</code></p>
@@ -387,7 +387,7 @@ co(function* () {
 	</aside>
 </section>
 
-<section data-bespoke-id="promises-learning-by-implementation">
+<section data-bespoke-id="promises-implementation">
 	<div class="content">
 		<h1>Learning by<br />implementation</h1>
 	</div>
@@ -397,7 +397,7 @@ co(function* () {
 	</aside>
 </section>
 
-<section data-bespoke-id="promises-done-internals">
+<section data-bespoke-id="promises-implementation-done">
 	<div class="content">
 		<h2>Promise internals: <code>done</code></h2>
 		<div>
@@ -543,7 +543,7 @@ Deferred.prototype = {
 	</aside>
 </section>
 
-<section data-bespoke-id="promises-resolution">
+<section data-bespoke-id="promises-implementation-resolution">
 	<div class="content">
 		<h2>Promise internals: Resolution</h2>
 		<pre><code>Promise.prototype._resolve = function (value) {
@@ -611,7 +611,7 @@ Deferred.prototype = {
 	</aside>
 </section>
 
-<section data-bespoke-id="promise-then">
+<section data-bespoke-id="promises-then">
 	<div class="content">
 		<h2>Constructing promises #3</h2>
 		<h2>Promise transformations: <code>then</code></h2>
@@ -636,7 +636,7 @@ jsonPromise.done(function (json) {
 	</aside>
 </section>
 
- <section data-bespoke-id="promises-then-error">
+ <section data-bespoke-id="promises-then-recovery">
 	<div class="content">
 		<h2>Transformations: Rejection into success</h2>
 		<p>Through transformations we can recover from errors back to success values</p>
@@ -674,7 +674,7 @@ var jsonPromise = ymlPromise.then(ymlToJson<span class="substep" data-order="3" 
 	</aside>
 </section>
 
-<section data-bespoke-id="promises-then-reject">
+<section data-bespoke-id="promises-then-rejection">
 	<div class="content">
 		<h2>Transformations: Success into rejection</h2>
 		<div class="substep" data-order="0">
@@ -695,7 +695,7 @@ promise.done(function (json) {
 	</aside>
 </section>
 
-<section data-bespoke-id="promises-nested">
+<section data-bespoke-id="promises-then-async">
 	<div class="content">
 		<h2>Asynchronous transformations</h2>
 		<div class="substep" data-order="0">
@@ -715,7 +715,7 @@ promise.done(function (json) {
 	</aside>
 </section>
 
-<section data-bespoke-id="promises-then-internals">
+<section data-bespoke-id="promises-implementation-then">
 	<div class="content">
 		<h2>Promise internals: <code>then</code></h2>
 		<pre><code>Promise.prototype.then = function (onSuccess, onFail) {<span class="substep" data-order="0">
@@ -752,7 +752,7 @@ promise.done(function (json) {
 	</aside>
 </section>
 
-<section data-bespoke-id="promises-error-swallowing">
+<section data-bespoke-id="promises-then-error-swallowing">
 	<div class="content">
 		<h2><code>then</code> (and <code>catch</code>) swallow errors</h2>
 		<pre><code>somePromise.then(function (value) {
@@ -776,7 +776,7 @@ promise.done(function (json) {
 	</aside>
 </section>
 
-<section data-bespoke-id="promises-then-done">
+<section data-bespoke-id="promises-no-done">
 	<div class="content">
 		<h2>Controversy #5: Some implementations do not provide <code>done</code></h2>
 		<p class="substep" data-order="0"><code>then</code> was first with already defined role<br />Error swallowing was addressed on top of that</p>
@@ -820,7 +820,7 @@ promise.done(function (json) {
 	</aside>
 </section>
 
-<section data-bespoke-id="es6-promises">
+<section data-bespoke-id="promises-es6">
 	<div class="content">
 		<h2>ECMAScript 6 Promises</h2>
 		<p>No <code>done</code> and no solution for error swallowing specified</p>
@@ -843,7 +843,7 @@ promise.done(function (json) {
 	</aside>
 </section>
 
-<section data-bespoke-id="to-done-or-not-to-done">
+<section data-bespoke-id="promises-to-done-or-not">
 	<div class="content">
 		<h2>To <code>done</code>, or not to <code>done</code></h2>
 		<ul>

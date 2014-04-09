@@ -27,6 +27,7 @@ require('bespoke-keys');
 bespoke.plugins.notes = require('bespoke-notes');
 require('bespoke-progress');
 bespoke.plugins.substeps = require('bespoke-substeps');
+require('bespoke-scale');
 require('bespoke-touch');
 
 options = {
@@ -34,6 +35,7 @@ options = {
 	keys: true,
 	notes: true,
 	progress: true,
+	scale: true,
 	substeps: true,
 	touch: true
 };

@@ -225,7 +225,7 @@ co(function* () {
   } catch (e) {
     // Handle error
     return;
-  }<span class="substep" data-order="2" data-action="display">
+  }<span class="substep" data-order="2" data-action="insert">
   try {
     result2 = yield asyncFn2(content);
   } catch (e) {
@@ -238,7 +238,7 @@ co(function* () {
     // Handle error
   }</span>
 })();</code></pre>
-				<pre class="substep" data-order="3" data-action="display"><code>co(function* () {
+				<pre class="substep" data-order="3" data-action="insert"><code>co(function* () {
   try {
     result1 = yield asyncFn1(input);
     result2 = yield asyncFn1(result1);
@@ -252,7 +252,7 @@ co(function* () {
 	</div>
 	<aside>
 		<p class="substep" data-order="1">Errors are handled using traditional try/catch style</p>
-		<div class="substep" data-order="3" data-action="display">
+		<div class="substep" data-order="3" data-action="insert">
 			<p>We can do better and address all errors with one handler</p>
 		</div>
 	</aside>
@@ -300,7 +300,7 @@ co(function* () {
 			<p>Starting from customized event emitters named promises, to jQuery chainable implemenation up to highly composable Promise/A+ implementations from which ECMAScript 6 version emerged.</p>
 			<p>This introduction will focus on Promise/A+ based design, as this one is most interesting, most powerful, and most importantly we'll have to deal with it in every ECMAScript 6 compliant engine.</p>
 		</div>
-		<div class="substep" data-order="0" data-action="display">
+		<div class="substep" data-order="0" data-action="insert">
 			<p>Promises designed that way, while powerful, come with controversies, and cannot be implemented without breaking some good API design rules.</p>
 			<p>It's source of a mixed feelings about promises, and source of many different opinions on how promises should work.</p>
 			<p>This also makes every promise implementation to some extent opinionated, it's not different with one standardized for ECMAScript 6.</p>
@@ -414,10 +414,10 @@ Promise.prototype.done = function (onSuccess, onFail) {<span class="substep" dat
 };
 <span class="substep" data-order="2">Promise.prototype._release = function (onSuccess, onFail) {
   <span class="substep" data-order="3">if (this._failed) {
-    <span class="substep" data-order="4" data-action="display">if (typeof onFail === 'function') </span>onFail(this._value);
+    <span class="substep" data-order="4" data-action="insert">if (typeof onFail === 'function') </span>onFail(this._value);
     <span class="substep" data-order="5">else throw this._value;</span>
   } else {
-    <span class="substep" data-order="4" data-action="display">if (typeof onSuccess === 'function') </span>onSuccess(this._value);
+    <span class="substep" data-order="4" data-action="insert">if (typeof onSuccess === 'function') </span>onSuccess(this._value);
   }</span>
 };</span></code></pre>
 			<p class="substep" data-order="6">There's one issue in above logic. What's that?</p>
@@ -549,9 +549,9 @@ Deferred.prototype = {
 		<pre><code>Promise.prototype._resolve = function (value) {
   <span class="substep" data-order="0">if (this._resolved) return;
   this._resolved = true;</span><span class="substep" data-order="2" data-action="remove">
-  <span class="substep" data-order="1">this._settle(value);</span></span><span class="substep" data-order="2" data-action="display">
+  <span class="substep" data-order="1">this._settle(value);</span></span><span class="substep" data-order="2" data-action="insert">
   if (value instanceof Promise) {
-    // <b class="substep" data-order="3" data-action="display">Controversy #3: </b>Recursive assimilation
+    // <b class="substep" data-order="3" data-action="insert">Controversy #3: </b>Recursive assimilation
     value.done(this._settle.bind(this), function (error) {
       this._failed = true;<span class="substep" data-order="4">// Rejected via resolve</span>
       this._settle(error);
@@ -571,7 +571,7 @@ Deferred.prototype = {
   this._value = value;<span class="substep" data-order="7" data-action="remove">
   this._callbacks.forEach(function (data) {
     this._release(data.onSuccess, data.onFail);
-  }, this);</span><span class="substep" data-order="7" data-action="display">
+  }, this);</span><span class="substep" data-order="7" data-action="insert">
   // <b>Controversy #4:</b> Release after `resolve` or `reject` returns
   setTimeout([].forEach.bind(this._callbacks, function (data) {
     this._release(data.onSuccess, data.onFail);
@@ -598,7 +598,7 @@ Deferred.prototype = {
 				<p>(...)</p>
 			</div>
 		</div>
-		<div class="substep" data-order="4" data-action="display">
+		<div class="substep" data-order="4" data-action="insert">
 			<p>(...)</p>
 			<p>Interesting case of <b>resolution</b> with a promise object is that if provided promise was rejected, our promise will also be rejected. It doesn't matter we called <code>resolve</code> and not <code>reject</code> initially</p>
 			<p class="substep" data-order="5">Reject logic is more straightforward as there's no assimilation of eventual promise value. It's totally fine as rejection with a promise is not logical. Same as we throw error instances in synchronous code, we should reject promises only with error objects.</p>
@@ -648,10 +648,10 @@ var ymlPromise = readFile('some.yml');
 var jsonPromise = ymlPromise.then(ymlToJson<span class="substep" data-order="3" data-action="remove">, function (err) {
   // YAML file not be accessible, fallback to an empty object
   return {};
-})<span class="substep" data-order="2" data-action="display">.then(null, function (err) {
+})<span class="substep" data-order="2" data-action="insert">.then(null, function (err) {
   // Conversion to JSON failed, fallback to an empty object
   return {};
-})</span></span><span class="substep" data-order="3" data-action="display">).<span class="substep" data-order="4" data-action="remove">then(null, </span><span class="substep" data-order="4" data-action="display">catch(</span>function (err) {
+})</span></span><span class="substep" data-order="3" data-action="insert">).<span class="substep" data-order="4" data-action="remove">then(null, </span><span class="substep" data-order="4" data-action="insert">catch(</span>function (err) {
   // YAML inaccessible or invalid, fallback to an empty object
   return {};
 })</span>);</code></pre>
@@ -722,15 +722,15 @@ promise.done(function (json) {
   return new Promise(function (resolve, reject) {
     <span class="substep" data-order="1">parent.done(function (value) {
       if (typeof onSuccess === 'function') {
-<mark class="substep" data-order="5" data-action="mark">        <span class="substep" data-order="3" data-action="remove"><span class="substep" data-order="2" data-action="display">value = </span>onSuccess(value);</span><span class="substep" data-order="3" data-action="display">try { value = onSuccess(value); }                          
+<mark class="substep" data-order="5" data-action="mark">        <span class="substep" data-order="3" data-action="remove"><span class="substep" data-order="2" data-action="insert">value = </span>onSuccess(value);</span><span class="substep" data-order="3" data-action="insert">try { value = onSuccess(value); }                          
         catch (e) { reject(e); return; }</span>                           </mark>
       }
       <span class="substep" data-order="2">resolve(value);</span>
     }, function (value) {
       if (typeof onFail === 'function') {
-<mark class="substep" data-order="5" data-action="mark">        </mark><span class="substep" data-order="3" data-action="remove"><mark class="substep" data-order="4" data-action="mark"><span class="substep" data-order="2" data-action="display">resolve(</span>onFail(value)<span class="substep" data-order="2" data-action="display">)</span>;</mark></span><span class="substep" data-order="3" data-action="display"><mark class="substep" data-order="5" data-action="mark">try { value = onFail(value); }                             
+<mark class="substep" data-order="5" data-action="mark">        </mark><span class="substep" data-order="3" data-action="remove"><mark class="substep" data-order="4" data-action="mark"><span class="substep" data-order="2" data-action="insert">resolve(</span>onFail(value)<span class="substep" data-order="2" data-action="insert">)</span>;</mark></span><span class="substep" data-order="3" data-action="insert"><mark class="substep" data-order="5" data-action="mark">try { value = onFail(value); }                             
         catch (e) { reject(e); return; }                           </mark>
-        resolve(value);</span><span class="substep" data-order="2" data-action="display">
+        resolve(value);</span><span class="substep" data-order="2" data-action="insert">
       } else {
         reject(value);</span>
       }
@@ -803,7 +803,7 @@ promise.done(function (json) {
 				<p>After error swallowing issue got exposed, nobody considered taking a step back to redefine role of <code>then</code></p>
 			</div>
 		</div>
-		<div class="substep" data-order="1" data-action="display">
+		<div class="substep" data-order="1" data-action="insert">
 			<p>(...)</p>
 			<p>Still this issue had to be addressed, and over time some solutions have been proposed</p>
 			<ul>

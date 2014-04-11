@@ -500,7 +500,7 @@ Deferred.prototype = {
 		<p>Early JavaScript implementations constructed promise objects that exposed both: methods to resolve the promise and methods to register callback for the value.</p>
 		<p>When passing such promise object to a consumer, we were also providing methods to resolve the promise, which didn't seem right.</p>
 		<div class="substep" data-order="0">
-			<p><a href="http://youtu.be/IbDF3UdgOb0?t=16m31s">Kris Kowal with Q implementation proposed separation of resolver and consumer concerns with two: deferred and promise interfaces</a></p>
+			<p><a href="http://youtu.be/IbDF3UdgOb0?t=16m31s">Kris Kowal's Q was one of the first libraries to propose separation of resolver and consumer concerns with two: deferred and promise interfaces</a></p>
 			<p>This pattern was followed by many other Promise/A+ like implementations afterwards</p>
 		</div>
 		<div class="substep" data-order="1">

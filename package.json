@@ -1,12 +1,12 @@
 {
   "name": "asynchronous-javascript-interfaces",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "bespoke": "0.4.x",
     "bespoke-history": "0.1.x",
     "bespoke-keys": "0.1.x",
-    "bespoke-notes": "0.1.x",
+    "bespoke-notes": "0.2.x",
     "bespoke-progress": "0.1.x",
     "bespoke-scale": "0.2.x",
     "bespoke-substeps": "0.1.x",

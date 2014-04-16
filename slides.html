@@ -16,7 +16,7 @@
 		<p>Made with <a href="http://markdalgleish.com/projects/bespoke.js/">Bespoke.js</a> engine developed by <a href="https://twitter.com/markdalgleish">Mark Dalgleish</a></p>
 		<p>See <a href="https://github.com/medikoo/asynchronous-javascript-interfaces">Github</a> for a source code of this presentation, and instructions on how to run it locally</p>
 		<hr />
-		<p><b>Use cursors (← →) for navigation<br />Swipe if your on touch device</b></p>
+		<p><b>Use cursors (← →) for navigation<br />Swipe when on touch device</b></p>
 		<p>You can toggle presentation notes by pressing the 'n' key</p>
 	</aside>
 </section>
@@ -93,12 +93,6 @@ obj.dispatchEvent('load', …args);</code></pre>
                     // Handle error
                     return;
                 }
-                <span class="substep">asyncFn5(result4, function (err, result5) {
-                    if (err) {
-                        // Handle error
-                        return;
-                    }
-                });</span>
             });</span>
         });</span>
     });</span>
@@ -153,7 +147,7 @@ asyncFn1(input, handle1);</code></pre>
 <section data-bespoke-id="generators">
 	<div class="content">
 		<h1>ES6 Generators</h1>
-		<h2 class="substep tk-nimbus">Special kind of function that can be suspended and resumed</h2>
+		<h2 class="substep tk-nimbus">Special kind of function that can be<br />suspended and resumed</h2>
 		<div class="substep" data-order="1">
 			<h2>Technically an iterator</h2>
 			<pre><code>generatorFn = function* () {
@@ -233,18 +227,12 @@ co(function* () {
   } catch (e) {
     // Handle error
     return;
-  }
-  try {
-    result3 = yield asyncFn3(result2);
-  } catch (e) {
-    // Handle error
   }</span>
 })();</code></pre>
 				<pre class="substep" data-order="3" data-action="insert"><code>co(function* () {
   try {
     result1 = yield asyncFn1(input);
     result2 = yield asyncFn1(result1);
-    result3 = yield asyncFn1(result2);
   } catch (e) {
     // Handle eventual error
   }
@@ -313,7 +301,7 @@ co(function* () {
 
 <section data-bespoke-id="promises-object">
 	<div class="content">
-		<h2>Promise: an object representation of a value we can't obtain immediately</h2>
+		<h2>Promise: an object representation of a<br />value we can't obtain immediately</h2>
 		<div>
 			<p>Instead of providing a callback for a value:</p>
 			<pre><code>readFile(path, function (err, fileContent) { ... });</code></pre>
@@ -780,8 +768,8 @@ promise.done(function (json) {
 
 <section data-bespoke-id="promises-no-done">
 	<div class="content">
-		<h2>Controversy #5: Some implementations do not provide <code>done</code></h2>
-		<p class="substep" data-order="0"><code>then</code> was first with already defined role<br />Error swallowing was addressed on top of that</p>
+		<h2>Controversy #5:<br />Some implementations do not provide <code>done</code></h2>
+		<p class="substep" data-order="0"><code>then</code> was first with already defined role, error swallowing was addressed on top of that</p>
 		<div class="substep" data-order="1">
 			<ul>
 				<li><p>Intially in <a href="https://github.com/kriskowal/q">Q</a>, end chain with <code>end</code></p>
@@ -790,7 +778,7 @@ promise.done(function (json) {
 }).end(); // Swallowed <span class="crash">exception re-thrown</span></code></pre></li>
 				<li class="substep" data-order="2"><p>Unhandled exceptions monitor</p>
 					<pre><code>Possibly unhandled TypeError: undefined is not a function</code></pre></li>
-				<li class="substep" data-order="3"><p><code>done</code> as addition to <code>then</code>, to be used <b>instead</b>, where transformation is not needed</p>
+				<li class="substep" data-order="3"><p><code>done</code> as addition to <code>then</code>, to be used <b>instead</b></p>
 					<pre><code>somePromise.done(function (value) {
   someArr.froEach(function () { ... });
 });// Unhandled <span class="crash">exception freely thrown</span></code></pre></li>

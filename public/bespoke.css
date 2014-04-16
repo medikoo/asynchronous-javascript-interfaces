@@ -97,7 +97,7 @@ article.bespoke-parent {
 	top: 50%;
 	left: 50%;
 	background: transparent;
-	padding: 40px;
+	padding: 20px;
 	-webkit-border-radius: 0;
 	border-radius: 0;
 }
@@ -264,12 +264,13 @@ pre span {
 }
 
 .bespoke-slide {
-	width: 840px;
-	height: 630px;
-	margin-top: -315px;
-	margin-left: -420px;
+	width: 800px;
+	height: 600px;
+	margin-top: -300px;
+	margin-left: -400px;
 }
 .bespoke-slide > div.content, .bespoke-slide > aside {
-	width: 840px;
-	height: 630px;
+	width: 760px;
+	height: 560px;
+	/*outline: 1px solid rgba(255, 255, 255, 0.1);*/
 }

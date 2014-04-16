@@ -37,10 +37,10 @@ article.bespoke-parent {
 	left: 0;
 	right: 0;
 	overflow: hidden;
-	-webkit-perspective: 600px;
-	-moz-perspective: 600px;
-	-ms-perspective: 600px;
-	perspective: 600px;
+	-webkit-perspective: 800px;
+	-moz-perspective: 800px;
+	-ms-perspective: 800px;
+	perspective: 800px;
 }
 @media print {
 	article.bespoke-parent {
@@ -189,10 +189,10 @@ li.bespoke-bullet-inactive {
 	filter: none;
 }
 .bespoke-scale-parent {
-	-webkit-perspective: 600px;
-	-moz-perspective: 600px;
-	-ms-perspective: 600px;
-	perspective: 600px;
+	-webkit-perspective: 800px;
+	-moz-perspective: 800px;
+	-ms-perspective: 800px;
+	perspective: 800px;
 	position: absolute;
 	top: 0;
 	left: 0;

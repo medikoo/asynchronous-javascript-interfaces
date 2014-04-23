@@ -713,14 +713,14 @@ promise.done(function (json) {
   return new Promise(function (resolve, reject) {
     <span class="substep" data-order="1">parent.done(function (value) {
       if (typeof onSuccess === 'function') {
-<mark class="substep" data-order="5" data-action="mark">        <span class="substep" data-order="3" data-action="remove"><span class="substep" data-order="2" data-action="insert">value = </span>onSuccess(value);</span><span class="substep" data-order="3" data-action="insert">try { value = onSuccess(value); }                          
-        catch (e) { reject(e); return; }</span>                           </mark>
+<mark class="substep" data-order="5" data-action="mark">        <span class="substep" data-order="3" data-action="remove"><span class="substep" data-order="2" data-action="insert">value = </span>onSuccess(value);</span><span class="substep" data-order="3" data-action="insert">try { value = onSuccess(value); }                                   
+        catch (e) { reject(e); return; }</span>                                    </mark>
       }
       <span class="substep" data-order="2">resolve(value);</span>
     }, function (value) {
       if (typeof onFail === 'function') {
-<mark class="substep" data-order="5" data-action="mark">        </mark><span class="substep" data-order="3" data-action="remove"><mark class="substep" data-order="4" data-action="mark"><span class="substep" data-order="2" data-action="insert">resolve(</span>onFail(value)<span class="substep" data-order="2" data-action="insert">)</span>;</mark></span><span class="substep" data-order="3" data-action="insert"><mark class="substep" data-order="5" data-action="mark">try { value = onFail(value); }                             
-        catch (e) { reject(e); return; }                           </mark>
+<mark class="substep" data-order="5" data-action="mark">        </mark><span class="substep" data-order="3" data-action="remove"><mark class="substep" data-order="4" data-action="mark"><span class="substep" data-order="2" data-action="insert">resolve(</span>onFail(value)<span class="substep" data-order="2" data-action="insert">)</span>;</mark></span><span class="substep" data-order="3" data-action="insert"><mark class="substep" data-order="5" data-action="mark">try { value = onFail(value); }                                      
+        catch (e) { reject(e); return; }                                    </mark>
         resolve(value);</span><span class="substep" data-order="2" data-action="insert">
       } else {
         reject(value);</span>

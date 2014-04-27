@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "asynchronous-javascript-interfaces",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Asynchronous JavaScript Interfaces (March 2014, MeetJS presentation)",
   "author": "Mariusz Nowak <medyk@medikoo.com> (http://www.medikoo.com/)",
   "repository": {
@@ -15,8 +15,8 @@
     "bespoke-notes": "0.2.x",
     "bespoke-progress": "0.1.x",
     "bespoke-scale": "0.2.x",
-    "bespoke-substeps": "0.1.x",
-    "bespoke-sync": "~0.1.1",
+    "bespoke-substeps": "~0.1.1",
+    "bespoke-sync": "~0.1.2",
     "bespoke-touch": "0.1.x",
     "connect": "~2.14.5",
     "deferred": "~0.7.1",

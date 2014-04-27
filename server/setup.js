@@ -1,6 +1,6 @@
 'use strict';
 
-var count    = require('es5-ext/lib/Object/count')
+var count    = require('es5-ext/object/count')
   , deferred = require('deferred')
   , resolve  = require('path').resolve
   , webmake  = require('webmake')

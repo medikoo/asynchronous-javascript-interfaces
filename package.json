@@ -1,7 +1,13 @@
 {
-  "name": "asynchronous-javascript-interfaces",
   "private": true,
+  "name": "asynchronous-javascript-interfaces",
   "version": "0.1.1",
+  "description": "Asynchronous JavaScript Interfaces (March 2014, MeetJS presentation)",
+  "author": "Mariusz Nowak <medyk@medikoo.com> (http://www.medikoo.com/)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/medikoo/asynchronous-javascript-interfaces.git"
+  },
   "dependencies": {
     "bespoke": "0.4.x",
     "bespoke-history": "0.1.x",
@@ -12,18 +18,19 @@
     "bespoke-substeps": "0.1.x",
     "bespoke-sync": "~0.1.1",
     "bespoke-touch": "0.1.x",
-    "connect": "~2.14",
-    "deferred": "~0.6.8",
-    "es5-ext": "~0.9.2",
+    "connect": "~2.14.5",
+    "deferred": "~0.7.1",
+    "es5-ext": "~0.10.2",
     "highlight.js": "8.x",
-    "memoizee": "~0.2.6",
+    "memoizee": "~0.3.1",
     "st": "~0.4.1",
-    "webmake": "~0.3.27"
+    "webmake": "~0.3.29"
   },
   "devDependencies": {
-    "webmake-middleware": "0.1.x"
+    "webmake-middleware": "~0.1.1"
   },
   "scripts": {
     "start": "node server/index.js"
-  }
+  },
+  "licence": "MIT"
 }

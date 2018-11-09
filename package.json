@@ -25,10 +25,10 @@
     "highlight.js": "^9.7",
     "memoizee": "^0.4.1",
     "st": "^1.2",
-    "webmake": "^0.3.40"
+    "webmake": "0.4"
   },
   "devDependencies": {
-    "webmake-middleware": "^0.1.2"
+    "webmake-middleware": "gillesruppert/webmake-middleware"
   },
   "scripts": {
     "start": "node server/index.js"
